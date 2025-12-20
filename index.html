@@ -1,152 +1,1582 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мария Астрид | Экзистенциальный психолог</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Математический кроссворд</title>
+    <style>
+    * {
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .answers-section {
+        display: none !important;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 20px;
+        margin: 0;
+        min-height: 100vh;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 30px;
+        width: 100%;
+    }
+    
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #3498db;
+        font-size: 1.8rem;
+    }
+    
+    .game-area {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .crossword-grid {
+        flex: 1;
+        min-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .questions {
+        flex: 1;
+        min-width: 300px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid #3498db;
+    }
+    
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(20, 40px);
+        grid-template-rows: repeat(20, 40px);
+        gap: 2px;
+        margin: 0 auto;
+        width: fit-content;
+    }
+    
+    .cell {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        position: relative;
+        background: white;
+    }
+    
+    .cell.black {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .cell.numbered::before {
+        content: attr(data-number);
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #3498db;
+    }
+    
+    .cell input {
+        width: 100%;
+        height: 100%;
+        border: none;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        text-transform: uppercase;
+        background: transparent;
+        outline: none;
+        color: #2c3e50;
+    }
+    
+    .cell input:focus {
+        background: #e8f4fc;
+    }
+    
+    .question-section {
+        margin-bottom: 25px;
+    }
+    
+    .question-section h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #e74c3c;
+        font-size: 1.2rem;
+    }
+    
+    .question {
+        margin-bottom: 12px;
+        padding-left: 10px;
+        border-left: 3px solid transparent;
+        transition: all 0.3s;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    
+    .question:hover {
+        border-left-color: #3498db;
+        background: #f0f7ff;
+        padding-left: 15px;
+    }
+    
+    .question-number {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        background: #3498db;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 25px;
+        margin-right: 10px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    
+    button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 16px;
+    }
+    
+    #checkBtn {
+        background: #2ecc71;
+        color: white;
+    }
+    
+    #checkBtn:hover {
+        background: #27ae60;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    }
+    
+    #showAnswersBtn {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    #showAnswersBtn:hover {
+        background: #c0392b;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+    }
+    
+    #resetBtn {
+        background: #f39c12;
+        color: white;
+    }
+    
+    #resetBtn:hover {
+        background: #d35400;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+    }
+    
+    .answers-section {
+        display: none;
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 5px solid #9b59b6;
+    }
+    
+    .answers-section h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+    
+    .answer-grid {
+        display: grid;
+        grid-template-columns: repeat(20, 40px);
+        grid-template-rows: repeat(20, 40px);
+        gap: 2px;
+        margin: 0 auto 20px;
+        width: fit-content;
+    }
+    
+    .answer-cell {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        background: white;
+        color: #2c3e50;
+    }
+    
+    .answer-cell.black {
+        background: #2c3e50;
+    }
+    
+    .answer-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 10px;
+    }
+    
+    .answer-item {
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+        border-left: 3px solid #9b59b6;
+    }
+    
+    .message {
+        text-align: center;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 10px;
+        font-weight: bold;
+        display: none;
+        width: 100%;
+    }
+    
+    .success {
+        background: #d5edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    /* ========== АДАПТИВНЫЕ СТИЛИ С МАЛЕНЬКИМИ КЛЕТКАМИ ========== */
+    
+    /* Контейнер для прокрутки на мобильных */
+    .grid-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        padding: 10px 0;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 15px;
+    }
+    
+    /* Убираем полосу прокрутки для WebKit браузеров */
+    .grid-scroll-container::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .grid-scroll-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .grid-scroll-container::-webkit-scrollbar-thumb {
+        background: #3498db;
+        border-radius: 3px;
+    }
+    
+    /* Для больших планшетов и маленьких ноутбуков (992px - 1200px) */
+    @media (max-width: 1200px) {
+        .container {
+            max-width: 95%;
+            padding: 25px;
+        }
+        
+        .grid, .answer-grid {
+            grid-template-columns: repeat(20, 32px);
+            grid-template-rows: repeat(20, 32px);
+        }
+        
+        .cell, .answer-cell {
+            width: 32px;
+            height: 32px;
+            font-size: 15px;
+        }
+        
+        .cell input {
+            font-size: 16px;
+        }
+        
+        .cell.numbered::before {
+            font-size: 8px;
+        }
+        
+        h1 {
+            font-size: 1.6rem;
+        }
+    }
+    
+    /* Для планшетов (768px - 991px) */
+    @media (max-width: 991px) {
+        body {
+            padding: 15px;
+        }
+        
+        .container {
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .game-area {
+            gap: 25px;
+        }
+        
+        .grid, .answer-grid {
+            grid-template-columns: repeat(20, 26px);
+            grid-template-rows: repeat(20, 26px);
+        }
+        
+        .cell, .answer-cell {
+            width: 26px;
+            height: 26px;
+            font-size: 13px;
+        }
+        
+        .cell input {
+            font-size: 14px;
+        }
+        
+        .cell.numbered::before {
+            font-size: 7px;
+            top: 1px;
+            left: 1px;
+        }
+        
+        h1 {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+        }
+        
+        .questions {
+            padding: 15px;
+        }
+        
+        .question {
+            font-size: 0.85rem;
+        }
+        
+        .question-number {
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            font-size: 12px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+    }
+    
+    /* Для больших телефонов (576px - 767px) */
+    @media (max-width: 767px) {
+        body {
+            padding: 10px;
+        }
+        
+        .container {
+            padding: 15px;
+            width: calc(100% - 20px);
+            margin: 0 auto;
+            border-radius: 10px;
+        }
+        
+        .game-area {
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .crossword-grid {
+            min-width: 100%;
+            width: 100%;
+            align-items: stretch;
+        }
+        
+        .questions {
+            min-width: 100%;
+            width: 100%;
+            padding: 15px;
+        }
+        
+        .grid, .answer-grid {
+            grid-template-columns: repeat(20, 20px);
+            grid-template-rows: repeat(20, 20px);
+            margin: 0 auto;
+            gap: 1px;
+        }
+        
+        .cell, .answer-cell {
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+        }
+        
+        .cell input {
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .cell.numbered::before {
+            font-size: 6px;
+            top: 0;
+            left: 0;
+        }
+        
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        
+        .question-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+        
+        .question {
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .question-number {
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            font-size: 11px;
+            margin-right: 8px;
+        }
+        
+        .controls {
+            gap: 10px;
+            margin-top: 15px;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 15px;
+            font-size: 13px;
+        }
+    }
+    
+    /* Для средних телефонов (481px - 575px) */
+    @media (max-width: 575px) {
+        body {
+            padding: 8px;
+        }
+        
+        .container {
+            padding: 12px;
+            width: calc(100% - 16px);
+        }
+        
+        .grid, .answer-grid {
+            grid-template-columns: repeat(20, 18px);
+            grid-template-rows: repeat(20, 18px);
+        }
+        
+        .cell, .answer-cell {
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+        }
+        
+        .cell input {
+            font-size: 11px;
+        }
+        
+        .cell.numbered::before {
+            font-size: 5px;
+        }
+        
+        h1 {
+            font-size: 1.1rem;
+        }
+        
+        .question {
+            font-size: 0.75rem;
+        }
+        
+        .controls {
+            gap: 8px;
+        }
+        
+        button {
+            min-width: 110px;
+            padding: 9px 14px;
+            font-size: 12px;
+        }
+    }
+    
+    /* Для маленьких телефонов (до 480px) */
+    @media (max-width: 480px) {
+        body {
+            padding: 6px;
+        }
+        
+        .container {
+            padding: 10px;
+            width: calc(100% - 12px);
+            border-radius: 8px;
+        }
+        
+        .grid, .answer-grid {
+            grid-template-columns: repeat(20, 16px);
+            grid-template-rows: repeat(20, 16px);
+            gap: 1px;
+        }
+        
+        .cell, .answer-cell {
+            width: 16px;
+            height: 16px;
+            font-size: 9px;
+        }
+        
+        .cell input {
+            font-size: 10px;
+        }
+        
+        .cell.numbered::before {
+            font-size: 4px;
+            top: 0;
+            left: 0;
+        }
+        
+        h1 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+        }
+        
+        .questions {
+            padding: 12px;
+        }
+        
+        .question-section h3 {
+            font-size: 0.9rem;
+        }
+        
+        .question {
+            font-size: 0.7rem;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        
+        .question-number {
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            font-size: 10px;
+            margin-right: 6px;
+        }
+        
+        .controls {
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        button {
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 10px;
+            font-size: 12px;
+        }
+    }
+    
+    /* Для очень маленьких телефонов (до 360px) */
+    @media (max-width: 360px) {
+        body {
+            padding: 4px;
+        }
+        
+        .container {
+            padding: 8px;
+            width: calc(100% - 8px);
+        }
+        
+        .grid, .answer-grid {
+            grid-template-columns: repeat(20, 14px);
+            grid-template-rows: repeat(20, 14px);
+        }
+        
+        .cell, .answer-cell {
+            width: 14px;
+            height: 14px;
+            font-size: 8px;
+        }
+        
+        .cell input {
+            font-size: 9px;
+        }
+        
+        .cell.numbered::before {
+            font-size: 3px;
+        }
+        
+        .question {
+            font-size: 0.65rem;
+        }
+        
+        .question-number {
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            font-size: 9px;
+        }
+    }
+    
+    /* Для экстремально маленьких экранов (до 320px) */
+    @media (max-width: 320px) {
+        body {
+            padding: 3px;
+        }
+        
+        .container {
+            padding: 7px;
+            width: calc(100% - 6px);
+            border-radius: 6px;
+        }
+        
+        .grid, .answer-grid {
+            grid-template-columns: repeat(20, 12px);
+            grid-template-rows: repeat(20, 12px);
+        }
+        
+        .cell, .answer-cell {
+            width: 12px;
+            height: 12px;
+            font-size: 7px;
+        }
+        
+        .cell input {
+            font-size: 8px;
+        }
+        
+        .cell.numbered::before {
+            font-size: 2.5px;
+        }
+        
+        h1 {
+            font-size: 0.9rem;
+        }
+        
+        .question {
+            font-size: 0.6rem;
+        }
+        
+        button {
+            padding: 8px;
+            font-size: 11px;
+        }
+    }
+    
+    /* Для ландшафтной ориентации на мобильных */
+    @media (max-height: 500px) and (orientation: landscape) {
+        .game-area {
+            flex-direction: row;
+            gap: 15px;
+        }
+        
+        .questions {
+            max-height: 250px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .crossword-grid {
+            flex: 2;
+        }
+        
+        .grid-scroll-container {
+            max-height: 250px;
+        }
+        
+        .controls {
+            margin-top: 10px;
+        }
+    }
+    /* Исправления для больших планшетов и десктопов */
+
+/* Для планшетов в портретной ориентации (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .game-area {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .crossword-grid {
+        flex: 1.2;
+        min-width: auto;
+        order: 1;
+    }
+    
+    .questions {
+        flex: 1;
+        min-width: auto;
+        order: 2;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(20, 28px);
+        grid-template-rows: repeat(20, 28px);
+    }
+    
+    .cell, .answer-cell {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+    
+    .cell input {
+        font-size: 14px;
+    }
+    
+    .cell.numbered::before {
+        font-size: 7px;
+    }
+    
+    .controls {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    button {
+        flex: 1;
+        margin: 0 5px;
+        padding: 10px 15px;
+    }
+}
+
+/* Для планшетов в ландшафтной ориентации (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .game-area {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 25px;
+    }
+    
+    .crossword-grid {
+        flex: 1.5;
+        min-width: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .questions {
+        flex: 1;
+        min-width: auto;
+        max-height: 700px;
+        overflow-y: auto;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(20, 30px);
+        grid-template-rows: repeat(20, 30px);
+    }
+    
+    .cell, .answer-cell {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .cell input {
+        font-size: 15px;
+    }
+    
+    .cell.numbered::before {
+        font-size: 8px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .question-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .question {
+        font-size: 0.9rem;
+    }
+}
+
+/* Для небольших ноутбуков (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .container {
+        max-width: 1100px;
+    }
+    
+    .game-area {
+        flex-direction: row;
+        gap: 30px;
+    }
+    
+    .crossword-grid {
+        flex: 1.8;
+        min-width: auto;
+    }
+    
+    .questions {
+        flex: 1;
+        min-width: auto;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(20, 34px);
+        grid-template-rows: repeat(20, 34px);
+    }
+    
+    .cell, .answer-cell {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+    
+    .cell input {
+        font-size: 17px;
+    }
+    
+    .cell.numbered::before {
+        font-size: 9px;
+    }
+}
+
+/* Для стандартных мониторов (1400px - 1599px) */
+@media (min-width: 1400px) and (max-width: 1599px) {
+    .container {
+        max-width: 1300px;
+    }
+    
+    .game-area {
+        gap: 35px;
+    }
+    
+    .crossword-grid {
+        flex: 2;
+    }
+    
+    .questions {
+        flex: 1;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(20, 36px);
+        grid-template-rows: repeat(20, 36px);
+    }
+    
+    .cell, .answer-cell {
+        width: 36px;
+        height: 36px;
+        font-size: 17px;
+    }
+    
+    .cell input {
+        font-size: 18px;
+    }
+    
+    .cell.numbered::before {
+        font-size: 9px;
+    }
+}
+
+/* Для больших мониторов (1600px и больше) */
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1500px;
+        padding: 35px;
+    }
+    
+    .game-area {
+        gap: 40px;
+    }
+    
+    .crossword-grid {
+        flex: 2.2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .questions {
+        flex: 1;
+        padding: 25px;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(20, 38px);
+        grid-template-rows: repeat(20, 38px);
+        gap: 2px;
+    }
+    
+    .cell, .answer-cell {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+    
+    .cell input {
+        font-size: 19px;
+    }
+    
+    .cell.numbered::before {
+        font-size: 10px;
+        top: 2px;
+        left: 2px;
+    }
+    
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 35px;
+    }
+    
+    .question-section h3 {
+        font-size: 1.3rem;
+    }
+    
+    .question {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+    
+    .question-number {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        font-size: 15px;
+    }
+}
+
+/* Для очень больших мониторов (1900px и больше) */
+@media (min-width: 1900px) {
+    .container {
+        max-width: 1800px;
+        padding: 40px;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(20, 42px);
+        grid-template-rows: repeat(20, 42px);
+    }
+    
+    .cell, .answer-cell {
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+    }
+    
+    .cell input {
+        font-size: 21px;
+    }
+    
+    .cell.numbered::before {
+        font-size: 11px;
+    }
+}
+
+/* Специальные стили для правильного центрирования */
+@media (min-width: 768px) {
+    .crossword-grid {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    
+    .grid-scroll-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .grid {
+        flex-shrink: 0;
+    }
+    
+    .controls {
+        width: 100%;
+        max-width: 600px;
+        margin-top: 25px;
+    }
+}
+
+/* Улучшение отображения на планшетах */
+@media (max-width: 991px) and (min-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 1.4rem;
+        margin-bottom: 25px;
+    }
+    
+    .message {
+        padding: 12px;
+        margin: 15px 0;
+    }
+}
+</style>
 </head>
 <body>
-    <!-- Шапка -->
-    <header class="header">
-        <div class="container">
-            <div class="header-inner">
-                <a href="#" class="logo">MA</a>
-                <nav class="nav">
-                    <a href="#about">Обо мне</a>
-                    <a href="#approach">Мой подход</a>
-                    <a href="#services">Услуги</a>
-                    <a href="#contact">Контакты</a>
-                </nav>
-                <button class="menu-toggle" aria-label="Меню">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Герой -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Мария Астрид</h1>
-                <p class="subtitle">Экзистенциальная психология для тех, кто ищет глубину</p>
-                <a href="#contact" class="btn">Запись на консультацию</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Обо мне -->
-    <section id="about" class="section about">
-        <div class="container">
-            <div class="about-grid">
-                <div class="about-photo">
-                    <div class="photo-placeholder"></div>
+    <div class="container">
+        <h1>📐 Математический кроссворд 📊</h1>
+        
+        <div class="game-area">
+            <div class="crossword-grid">
+                <div class="grid" id="crosswordGrid">
+                    <!-- Кроссворд будет сгенерирован JavaScript -->
                 </div>
-                <div class="about-text">
-                    <h2>Обо мне</h2>
-                    <p>12 лет помогаю людям находить диалог с собой. Моя специализация — экзистенциальные кризисы, профессиональное выгорание и поиск идентичности.</p>
-                    <p>Образование: PhD по клинической психологии (Сорбонна), сертификат по логотерапии (Вена), автор метода "Сознательная интроспекция".</p>
-                    <p>Работаю с творческими профессионалами, предпринимателями и теми, кто чувствует, что "застрял" в жизни.</p>
+                
+                <div class="message" id="message"></div>
+                
+                <div class="controls">
+                    <button id="checkBtn">Проверить ответы</button>
+                    <button id="showAnswersBtn">Показать ответы</button>
+                    <button id="resetBtn">Очистить кроссворд</button>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Подход -->
-    <section id="approach" class="section approach">
-        <div class="container">
-            <h2>Мой подход</h2>
-            <div class="approach-cards">
-                <div class="card">
-                    <h3>Без шаблонов</h3>
-                    <p>Каждая терапия — уникальный процесс, построенный вокруг ваших ценностей</p>
-                </div>
-                <div class="card">
-                    <h3>Честность</h3>
-                    <p>Прямые вопросы, которые помогают добраться до сути</p>
-                </div>
-                <div class="card">
-                    <h3>Фокус на смыслах</h3>
-                    <p>Работаем не только с симптомами, но с их экзистенциальным значением</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Услуги -->
-    <section id="services" class="section services">
-        <div class="container">
-            <h2>Формат работы</h2>
-            <div class="service-cards">
-                <div class="service-card">
-                    <h3>Индивидуально</h3>
-                    <p>60 мин · 5 000 ₽</p>
-                    <ul>
-                        <li>Личная сессия</li>
-                        <li>Работа с запросом</li>
-                        <li>Домашние наблюдения</li>
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>Пара</h3>
-                    <p>90 мин · 8 000 ₽</p>
-                    <ul>
-                        <li>Анализ динамики</li>
-                        <li>Проработка конфликтов</li>
-                        <li>Восстановление диалога</li>
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>Глубинная терапия</h3>
-                    <p>120 мин · 12 000 ₽</p>
-                    <ul>
-                        <li>Работа с травмой</li>
-                        <li>Экзистенциальный анализ</li>
-                        <li>Долгосрочные изменения</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Контакты -->
-    <section id="contact" class="section contact">
-        <div class="container">
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <h2>Контакты</h2>
-                    <p>г. Москва, Пятницкая ул. 42<br>Кабинет "Психея"</p>
-                    <p>+7 (977) 123-45-67<br>astrid@therapy.ru</p>
-                    <div class="social">
-                        <a href="#">Instagram</a>
-                        <a href="#">Telegram</a>
+            
+            <div class="questions">
+                <div class="question-section">
+                    <h3>➡️ По горизонтали:</h3>
+                    <div id="horizontalQuestions">
+                        <!-- Горизонтальные вопросы будут добавлены через JS -->
                     </div>
                 </div>
-                <div class="contact-form">
-                    <form id="consult-form">
-                        <input type="text" placeholder="Имя" required>
-                        <input type="email" placeholder="Email" required>
-                        <textarea placeholder="Ваш запрос..." rows="4"></textarea>
-                        <button type="submit" class="btn">Отправить</button>
-                    </form>
+                
+                <div class="question-section">
+                    <h3>⬇️ По вертикали:</h3>
+                    <div id="verticalQuestions">
+                        <!-- Вертикальные вопросы будут добавлены через JS -->
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Футер -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2023 Мария Астрид. Все права защищены</p>
+        
+        <div class="answers-section" id="answersSection">
+            <h3>✅ Правильные ответы:</h3>
+            <div class="answer-grid" id="answerGrid">
+                <!-- Ответы будут сгенерированы JavaScript -->
+            </div>
+            
+            <div class="answer-list" id="answerList">
+                <!-- Список ответов будет сгенерирован JavaScript -->
+            </div>
         </div>
-    </footer>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Данные кроссворда
+        const crosswordData = {
+            // Определение сетки: 0 - пустая клетка, 1 - черная клетка
+            grid: [
+     [1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1],
+    [1,1,1,0,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,1],
+    [1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1],
+    [1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1],
+    [1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1],
+    [0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1],
+    [0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1],
+    [0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1],
+    [0,1,1,1,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,1],
+    [0,1,1,1,1,1,1,0,1,1,0,1,0,1,1,1,0,1,1,1],
+    [0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,1,1,1],
+    [0,1,0,1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,1,1],
+    [0,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1],
+    [0,1,0,1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1] 
+],
+            
+            // Слова по горизонтали
+            horizontal: [
+                {number: 1, row: 0, col: 3, answer: "КОСИНУС", clue: "Отношение прилежащего катета к гипотенузе в прямоугольном треугольнике"},
+                {number: 3, row: 14, col: 4, answer: "ПИФАГОР", clue: "Древнегреческий математик, автор знаменитой теоремы"},
+                {number: 4, row: 9,  col: 2, answer: "ПАРАБОЛА", clue: "График квадратичной функции"},
+                 {number: 5, row: 16, col: 0, answer: "АБСЦИССА", clue: "Координата точки по оси X"},
+                {number: 7, row: 16, col: 12, answer: "ОСЬ", clue: "Прямая, относительно которой симметричен график четной функции"},
+                {number: 8, row: 12, col: 6, answer: "СИММЕТРИЯ", clue: "Свойство геометрической фигуры, при котором ее части mirror друг друга"},
+                {number: 10, row: 2, col: 3, answer: "ОТРЕЗОК", clue: "Часть прямой, ограниченная двумя точками"},
+                 {number: 14, row: 10,  col: 11, answer: "ЛОГАРИФМ", clue: "Показатель степени, в которую надо возвести основание, чтобы получить число"},
+                {number: 12, row: 7, col: 2, answer: "ТАНГЕНС", clue: "Отношение противолежащего катета к прилежащему"},
+                {number: 13, row: 5, col: 3, answer: "ИНТЕГРАЛ", clue: "Одно из основных понятий математического анализа"},
+                {number: 15, row: 5, col: 14, answer: "ЧИСЛО", clue: "Основное понятие математики, используемое для счета"},
+                {number: 17, row: 3,  col: 12,  answer: "МАТРИЦА", clue: "Прямоугольная таблица чисел или других математических объектов"},
+                {number: 19, row: 19,  col: 7, answer: "КОРЕНЬ", clue: "Решение уравнения, значение переменной, обращающее уравнение в тождество"}
+                
+            ],
+            
+            // Слова по вертикали
+            vertical: [
+                {number: 1, row: 0, col: 3, answer: "КООРДИНАТА", clue: "Число, определяющее положение точки на прямой, плоскости или в пространстве"},
+                
+                {number: 6, row: 2, col: 16, answer: "БИССЕКТРИСА", clue: "Луч, исходящий из вершины угла и делящий его пополам"},
+                {number: 9, row: 10, col: 12, answer: "ОКРУЖНОСТЬ", clue: "Множество всех точек плоскости, равноудаленных от заданной точки"},
+                {number: 11, row: 0,  col: 9, answer: "СЕКУЩАЯ", clue: "Прямая, пересекающая кривую в двух или более точках"},
+                {number: 16, row: 11, col: 10, answer: "ТЕОРЕМА", clue: "Утверждение, требующее доказательства"},
+                {number: 18, row: 9,   col: 7, answer: "ОРДИНАТА", clue: "Координата точки по оси Y"},
+                {number: 21, row: 12,  col: 2, answer: "КОНУС", clue: "Тело, полученное объединением всех лучей, исходящих из одной точки"},
+                {number: 20, row: 7,  col: 0, answer: "ГИПОТЕНУЗА", clue: "Сторона прямоугольного треугольника, противоположная прямому углу"}
+            ]
+        };
+
+        // Глобальные переменные
+        let crosswordCells = [];
+        let currentCell = null;
+
+        // Инициализация кроссворда
+        function initCrossword() {
+            const grid = document.getElementById('crosswordGrid');
+            grid.innerHTML = '';
+            crosswordCells = [];
+            
+            // Создаем клетки сетки
+            for (let row = 0; row < 20; row++) {
+                for (let col = 0; col < 20; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    
+                    // Проверяем, черная ли клетка
+                    if (crosswordData.grid[row][col] === 1) {
+                        cell.classList.add('black');
+                        grid.appendChild(cell);
+                        continue;
+                    }
+                    
+                    // Проверяем, нужно ли добавить номер
+                    let cellNumber = null;
+                    
+                    // Проверяем горизонтальные слова
+                    for (const word of crosswordData.horizontal) {
+                        if (word.row === row && word.col === col) {
+                            cellNumber = word.number;
+                            break;
+                        }
+                    }
+                    
+                    // Проверяем вертикальные слова
+                    if (!cellNumber) {
+                        for (const word of crosswordData.vertical) {
+                            if (word.row === row && word.col === col) {
+                                cellNumber = word.number;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (cellNumber) {
+                        cell.classList.add('numbered');
+                        cell.setAttribute('data-number', cellNumber);
+                    }
+                    
+                    // Добавляем input для ввода буквы
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.dataset.row = row;
+                    input.dataset.col = col;
+                    
+                    // Обработчики событий для input
+                    input.addEventListener('input', handleInput);
+                    input.addEventListener('keydown', handleKeyDown);
+                    input.addEventListener('focus', () => {
+                        currentCell = {row, col};
+                    });
+                    
+                    cell.appendChild(input);
+                    grid.appendChild(cell);
+                    
+                    // Сохраняем ссылку на input
+                    if (!crosswordCells[row]) crosswordCells[row] = [];
+                    crosswordCells[row][col] = input;
+                }
+            }
+            
+            // Заполняем вопросы
+            fillQuestions();
+            
+            // Создаем сетку с ответами
+            createAnswerGrid();
+        }
+        
+        // Заполнение вопросов
+        function fillQuestions() {
+            const horizontalDiv = document.getElementById('horizontalQuestions');
+            const verticalDiv = document.getElementById('verticalQuestions');
+            
+            horizontalDiv.innerHTML = '';
+            verticalDiv.innerHTML = '';
+            
+            // Горизонтальные вопросы
+            crosswordData.horizontal.sort((a, b) => a.number - b.number).forEach(word => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <span class="question-number">${word.number}</span>
+                    ${word.clue} (${word.answer.length} букв)
+                `;
+                horizontalDiv.appendChild(questionDiv);
+            });
+            
+            // Вертикальные вопросы
+            crosswordData.vertical.sort((a, b) => a.number - b.number).forEach(word => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <span class="question-number">${word.number}</span>
+                    ${word.clue} (${word.answer.length} букв)
+                `;
+                verticalDiv.appendChild(questionDiv);
+            });
+        }
+        
+        // Создание сетки с ответами
+        function createAnswerGrid() {
+            const answerGrid = document.getElementById('answerGrid');
+            const answerList = document.getElementById('answerList');
+            
+            answerGrid.innerHTML = '';
+            answerList.innerHTML = '';
+            
+            // Создаем сетку с ответами
+            for (let row = 0; row < 20; row++) {
+                for (let col = 0; col < 20; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'answer-cell';
+                    
+                    // Проверяем, черная ли клетка
+                    if (crosswordData.grid[row][col] === 1) {
+                        cell.classList.add('black');
+                        answerGrid.appendChild(cell);
+                        continue;
+                    }
+                    
+                    // Ищем букву для этой клетки
+                    let letter = '';
+                    
+                    // Проверяем горизонтальные слова
+                    for (const word of crosswordData.horizontal) {
+                        const {row: wordRow, col: wordCol, answer} = word;
+                        if (row === wordRow && col >= wordCol && col < wordCol + answer.length) {
+                            letter = answer[col - wordCol];
+                            break;
+                        }
+                    }
+                    
+                    // Проверяем вертикальные слова, если буква еще не найдена
+                    if (!letter) {
+                        for (const word of crosswordData.vertical) {
+                            const {row: wordRow, col: wordCol, answer} = word;
+                            if (col === wordCol && row >= wordRow && row < wordRow + answer.length) {
+                                letter = answer[row - wordRow];
+                                break;
+                            }
+                        }
+                    }
+                    
+                    cell.textContent = letter;
+                    answerGrid.appendChild(cell);
+                }
+            }
+            
+            // Создаем список ответов
+            const allWords = [...crosswordData.horizontal, ...crosswordData.vertical].sort((a, b) => a.number - b.number);
+            
+            allWords.forEach(word => {
+                const answerItem = document.createElement('div');
+                answerItem.className = 'answer-item';
+                answerItem.innerHTML = `<strong>${word.number}. ${word.answer}</strong> - ${word.clue}`;
+                answerList.appendChild(answerItem);
+            });
+        }
+        
+        // Обработка ввода в клетку
+        function handleInput(e) {
+            const input = e.target;
+            const row = parseInt(input.dataset.row);
+            const col = parseInt(input.dataset.col);
+            
+            // Переводим в верхний регистр
+            input.value = input.value.toUpperCase();
+            
+            // Если ввели букву, переходим к следующей клетке
+            if (input.value.length === 1) {
+                moveToNextCell(row, col);
+            }
+        }
+        
+        // Обработка нажатия клавиш
+        function handleKeyDown(e) {
+            const input = e.target;
+            const row = parseInt(input.dataset.row);
+            const col = parseInt(input.dataset.col);
+            
+            // Стрелки для навигации
+            if (e.key === 'ArrowRight') {
+                moveToCell(row, col + 1);
+                e.preventDefault();
+            } else if (e.key === 'ArrowLeft') {
+                moveToCell(row, col - 1);
+                e.preventDefault();
+            } else if (e.key === 'ArrowDown') {
+                moveToCell(row + 1, col);
+                e.preventDefault();
+            } else if (e.key === 'ArrowUp') {
+                moveToCell(row - 1, col);
+                e.preventDefault();
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                // При удалении очищаем текущую клетку и переходим назад
+                if (input.value === '') {
+                    moveToPrevCell(row, col);
+                }
+            }
+        }
+        
+        // Переход к следующей клетке
+        function moveToNextCell(row, col) {
+            // Сначала пытаемся перейти вправо
+            if (moveToCell(row, col + 1)) return;
+            
+            // Если не получилось, пытаемся перейти вниз
+            if (moveToCell(row + 1, 0)) return;
+            
+            // Если и это не получилось, переходим к началу
+            moveToCell(0, 0);
+        }
+        
+        // Переход к предыдущей клетке
+        function moveToPrevCell(row, col) {
+            // Сначала пытаемся перейти влево
+            if (moveToCell(row, col - 1)) return;
+            
+            // Если не получилось, пытаемся перейти к последней клетке предыдущей строки
+            for (let r = row - 1; r >= 0; r--) {
+                for (let c = 19; c >= 0; c--) {
+                    if (crosswordCells[r] && crosswordCells[r][c] && !crosswordCells[r][c].parentElement.classList.contains('black')) {
+                        crosswordCells[r][c].focus();
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        // Переход к конкретной клетке
+        function moveToCell(row, col) {
+            if (row >= 0 && row < 20 && col >= 0 && col < 20 && 
+                crosswordCells[row] && crosswordCells[row][col] && 
+                !crosswordCells[row][col].parentElement.classList.contains('black')) {
+                crosswordCells[row][col].focus();
+                return true;
+            }
+            return false;
+        }
+        
+        // Проверка ответов
+        function checkAnswers() {
+            let correct = true;
+            let message = '';
+            
+            // Проверяем горизонтальные слова
+            for (const word of crosswordData.horizontal) {
+                const {row, col, answer} = word;
+                let userAnswer = '';
+                
+                for (let i = 0; i < answer.length; i++) {
+                    const cell = crosswordCells[row][col + i];
+                    userAnswer += cell ? cell.value.toUpperCase() : '';
+                }
+                
+                if (userAnswer !== answer) {
+                    correct = false;
+                    // Подсвечиваем неправильные клетки
+                    for (let i = 0; i < answer.length; i++) {
+                        const cell = crosswordCells[row][col + i];
+                        if (cell && cell.value.toUpperCase() !== answer[i]) {
+                            cell.style.backgroundColor = '#f8d7da';
+                        }
+                    }
+                } else {
+                    // Подсвечиваем правильные клетки
+                    for (let i = 0; i < answer.length; i++) {
+                        const cell = crosswordCells[row][col + i];
+                        if (cell) {
+                            cell.style.backgroundColor = '#d5edda';
+                        }
+                    }
+                }
+            }
+            
+            // Проверяем вертикальные слова
+            for (const word of crosswordData.vertical) {
+                const {row, col, answer} = word;
+                let userAnswer = '';
+                
+                for (let i = 0; i < answer.length; i++) {
+                    const cell = crosswordCells[row + i] ? crosswordCells[row + i][col] : null;
+                    userAnswer += cell ? cell.value.toUpperCase() : '';
+                }
+                
+                if (userAnswer !== answer) {
+                    correct = false;
+                    // Подсвечиваем неправильные клетки
+                    for (let i = 0; i < answer.length; i++) {
+                        const cell = crosswordCells[row + i] ? crosswordCells[row + i][col] : null;
+                        if (cell && cell.value.toUpperCase() !== answer[i]) {
+                            cell.style.backgroundColor = '#f8d7da';
+                        }
+                    }
+                } else {
+                    // Подсвечиваем правильные клетки
+                    for (let i = 0; i < answer.length; i++) {
+                        const cell = crosswordCells[row + i] ? crosswordCells[row + i][col] : null;
+                        if (cell) {
+                            cell.style.backgroundColor = '#d5edda';
+                        }
+                    }
+                }
+            }
+            
+            // Показываем сообщение
+            const messageDiv = document.getElementById('message');
+            if (correct) {
+                messageDiv.textContent = '🎉 Поздравляем! Все ответы верны! 🎉';
+                messageDiv.className = 'message success';
+            } else {
+                messageDiv.textContent = 'Есть ошибки. Проверьте подсвеченные красным клетки.';
+                messageDiv.className = 'message error';
+            }
+            messageDiv.style.display = 'block';
+        }
+        
+        // Показать ответы
+        function showAnswers() {
+            // Заполняем кроссворд правильными ответами
+            for (const word of crosswordData.horizontal) {
+                const {row, col, answer} = word;
+                for (let i = 0; i < answer.length; i++) {
+                    const cell = crosswordCells[row][col + i];
+                    if (cell) {
+                        cell.value = answer[i];
+                        cell.style.backgroundColor = '#d5edda';
+                    }
+                }
+            }
+            
+            for (const word of crosswordData.vertical) {
+                const {row, col, answer} = word;
+                for (let i = 0; i < answer.length; i++) {
+                    const cell = crosswordCells[row + i] ? crosswordCells[row + i][col] : null;
+                    if (cell) {
+                        cell.value = answer[i];
+                        cell.style.backgroundColor = '#d5edda';
+                    }
+                }
+            }
+            
+            // Показываем секцию с ответами
+            document.getElementById('answersSection').style.display = 'block';
+            
+            // Показываем сообщение
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = 'Ответы показаны. Вы можете начать заново, нажав "Очистить кроссворд".';
+            messageDiv.className = 'message success';
+            messageDiv.style.display = 'block';
+        }
+        
+        // Очистить кроссворд
+        function resetCrossword() {
+            // Очищаем все клетки
+            for (let row = 0; row < 20 ; row++) {
+                for (let col = 0; col < 20; col++) {
+                    if (crosswordCells[row] && crosswordCells[row][col]) {
+                        crosswordCells[row][col].value = '';
+                        crosswordCells[row][col].style.backgroundColor = '';
+                    }
+                }
+            }
+            
+            // Скрываем секцию с ответами
+            document.getElementById('answersSection').style.display = 'none';
+            
+            // Скрываем сообщение
+            document.getElementById('message').style.display = 'none';
+            
+            // Фокусируемся на первой клетке
+            if (crosswordCells[0] && crosswordCells[0][3]) {
+                crosswordCells[0][3].focus();
+            }
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initCrossword();
+            
+            // Назначаем обработчики кнопок
+            document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+            document.getElementById('showAnswersBtn').addEventListener('click', showAnswers);
+            document.getElementById('resetBtn').addEventListener('click', resetCrossword);
+            
+            // Фокусируемся на первой клетке
+            setTimeout(() => {
+                if (crosswordCells[0] && crosswordCells[0][3]) {
+                    crosswordCells[0][3].focus();
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>
