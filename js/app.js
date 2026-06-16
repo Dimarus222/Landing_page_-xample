@@ -96,7 +96,7 @@ function getNote(id) { return getNotes()[id] || ''; }
 function saveNote(id, text) { const n = getNotes(); n[id] = text; setLS(LS_KEYS.NOTES, n); }
 
 // ==================== ТЕМЫ ====================
-const THEMES = ['dark', 'light', 'sepia'];
+const THEMES = ['dark','sepia'];
 function getTheme() { return getLS(LS_KEYS.THEME, 'dark'); }
 function setTheme(name) { document.documentElement.setAttribute('data-theme', name); setLS(LS_KEYS.THEME, name); }
 function toggleTheme() { const cur = getTheme(); const next = THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]; setTheme(next); }
