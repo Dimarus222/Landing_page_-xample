@@ -381,7 +381,8 @@ const SEMESTER_1 = (function() {
             {t:"📜 ГОСТ Р 34.12-2018 (Кузнечик)", u:"https://www.rfc-editor.org/rfc/rfc7801"}
         ]
     };
-    if (!window.__SECOPTICON_SEMESTERS) window.__SECOPTICON_SEMESTERS = [];
-window.__SECOPTICON_SEMESTERS.push({ id: 1, data: SEMESTER_1 });
 })();
 // Саморегистрация семестра
+// Саморегистрация семестра
+if (!window.__SECOPTICON_SEMESTERS) window.__SECOPTICON_SEMESTERS = [];
+window.__SECOPTICON_SEMESTERS.push({ id: 1, data: SEMESTER_1 });
