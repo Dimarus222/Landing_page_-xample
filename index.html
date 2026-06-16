@@ -34,6 +34,9 @@
             crossorigin="anonymous"
             referrerpolicy="no-referrer"></script>
     
+    <!-- PWA-манифест -->
+    <link rel="manifest" href="manifest.json">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 </head>
@@ -41,6 +44,7 @@
 
 <div id="mobile-topbar">
     <span class="logo"><i class="fas fa-book-dead"></i> SecOpticon</span>
+    <span id="offline-indicator" title="Оффлайн-режим" style="display:none; margin-right:8px; font-size:0.9rem;">📡</span>
     <button id="menu-toggle" onclick="toggleMobileSidebar()" aria-label="Открыть меню навигации">
         <i class="fas fa-bars"></i>
     </button>
@@ -54,14 +58,35 @@
 <aside id="sidebar" role="navigation" aria-label="Оглавление курса">
     <div id="sidebar-header">
         <h2><i class="fas fa-book-dead"></i> SecOpticon</h2>
+        
+        <!-- Кнопка случайного урока -->
+        <button onclick="openRandomLesson()" 
+                style="width:100%; padding:6px; margin:6px 0; background:var(--surface2); border:1px solid var(--border); color:var(--accent-cyan); border-radius:4px; cursor:pointer; font-size:0.8rem;"
+                aria-label="Открыть случайный урок">
+            <i class="fas fa-random"></i> Случайный урок
+        </button>
+        
         <input type="text" id="search-box" placeholder="Поиск по урокам..." oninput="filterLessons()" aria-label="Поиск по названию и содержимому уроков">
+        
         <div class="progress-mini">
             <div class="progress-mini-fill" id="global-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Общий прогресс курса"></div>
         </div>
-        <small id="lesson-counter">Загружено уроков: 0</small>
-        <div style="display:flex;gap:4px;margin-top:8px;">
-            <button onclick="exportProgress()" aria-label="Скачать прогресс и заметки" title="Скачать прогресс" style="flex:1;padding:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:4px;cursor:pointer;font-size:0.7rem;"><i class="fas fa-download"></i> Скачать</button>
-            <button onclick="document.getElementById('import-progress-input').click()" aria-label="Загрузить прогресс и заметки" title="Загрузить прогресс" style="flex:1;padding:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:4px;cursor:pointer;font-size:0.7rem;"><i class="fas fa-upload"></i> Загрузить</button>
+        <small id="lesson-counter">Пройдено: 0 из 0</small>
+        
+        <!-- Кнопки темы и экспорта/импорта -->
+        <div style="display:flex; gap:4px; margin-top:8px;">
+            <button onclick="toggleTheme()" title="Сменить тему (тёмная/светлая/сепия)" aria-label="Сменить тему оформления"
+                    style="flex:1; padding:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
+                <i class="fas fa-palette"></i> Тема
+            </button>
+            <button onclick="exportProgress()" title="Скачать прогресс" aria-label="Скачать прогресс и заметки"
+                    style="flex:1; padding:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
+                <i class="fas fa-download"></i>
+            </button>
+            <button onclick="document.getElementById('import-progress-input').click()" title="Загрузить прогресс" aria-label="Загрузить прогресс и заметки"
+                    style="flex:1; padding:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
+                <i class="fas fa-upload"></i>
+            </button>
             <input type="file" id="import-progress-input" accept=".json" onchange="importProgress(this)" style="display:none;" aria-label="Выберите файл прогресса">
         </div>
     </div>
@@ -80,7 +105,7 @@
     </div>
 </main>
 
-<!-- Данные семестров (загружаются до ядра) -->
+<!-- Данные семестров -->
 <script src="js/data/s1-math.js"></script>
 <script src="js/data/s2-cs.js"></script>
 <script src="js/data/s3-os-net.js"></script>
@@ -90,8 +115,14 @@
 <!-- Ядро приложения -->
 <script src="js/app.js"></script>
 
-</body>
-</html>
+<!-- Регистрация Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW failed', err));
+  }
+</script>
 
 </body>
-        </html>
+</html>
