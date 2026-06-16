@@ -1,5 +1,5 @@
-// app.js v3.1 — SecOpticon
-// Функции: роутинг, a11y, прогресс, избранное, заметки, темы, оффлайн-индикатор, PWA
+// app.js v3.2 — SecOpticon
+// Темы: тёмная / сепия (светлая убрана)
 
 let DB = { semesters: [] };
 let currentSemesterId = null;
@@ -95,22 +95,26 @@ function getNotes() { return getLS(LS_KEYS.NOTES, {}); }
 function getNote(id) { return getNotes()[id] || ''; }
 function saveNote(id, text) { const n = getNotes(); n[id] = text; setLS(LS_KEYS.NOTES, n); }
 
-// ==================== ТЕМЫ ====================
-const THEMES = ['dark','sepia'];
+// ==================== ТЕМЫ (ТОЛЬКО ТЁМНАЯ И СЕПИЯ) ====================
+const THEMES = ['dark', 'sepia']; // ← ИСПРАВЛЕНО
 function getTheme() { return getLS(LS_KEYS.THEME, 'dark'); }
-function setTheme(name) { document.documentElement.setAttribute('data-theme', name); setLS(LS_KEYS.THEME, name); }
-function toggleTheme() { const cur = getTheme(); const next = THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]; setTheme(next); }
+function setTheme(name) {
+  document.documentElement.setAttribute('data-theme', name);
+  setLS(LS_KEYS.THEME, name);
+}
+function toggleTheme() {
+  const cur = getTheme();
+  const curIndex = THEMES.indexOf(cur);
+  const nextIndex = (curIndex + 1) % THEMES.length;
+  setTheme(THEMES[nextIndex]);
+}
 function applyTheme() { setTheme(getTheme()); }
 
 // ==================== ОФФЛАЙН-ИНДИКАТОР ====================
 function updateOnlineStatus() {
   const indicator = document.getElementById('offline-indicator');
   if (!indicator) return;
-  if (navigator.onLine) {
-    indicator.style.display = 'none';
-  } else {
-    indicator.style.display = 'inline';
-  }
+  indicator.style.display = navigator.onLine ? 'none' : 'inline';
 }
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
@@ -164,7 +168,7 @@ function buildTree(filter = '') {
     filteredLessons.forEach(lesson => {
       const wrapper = document.createElement('div');
       wrapper.style.cssText = 'display:flex;align-items:center;border-left:3px solid transparent;';
-      if(currentLessonId === lesson.id && currentSemesterId === semester.id) { wrapper.style.borderLeftColor = 'var(--accent-blue)'; wrapper.style.background = '#161b22'; }
+      if(currentLessonId === lesson.id && currentSemesterId === semester.id) { wrapper.style.borderLeftColor = 'var(--accent-blue)'; wrapper.style.background = 'var(--active-bg)'; }
 
       const check = document.createElement('span'); check.style.cssText = 'cursor:pointer;padding:6px 4px 6px 16px;font-size:0.8rem;flex-shrink:0;';
       check.innerHTML = progress[lesson.id] ? '<i class="fas fa-check-circle" style="color:var(--accent-green)" aria-label="Пройдено"></i>' : '<i class="far fa-circle" style="color:var(--text-secondary)" aria-label="Не пройдено"></i>';
