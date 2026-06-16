@@ -172,3 +172,15 @@ th { background:#1c2333; font-weight:600; }
         color: black !important;
     }
 }
+
+/* Стили для оффлайн-индикатора (если нужны дополнительные) */
+#offline-indicator {
+  color: var(--accent-red);
+}
+
+/* Адаптация для кнопок в сайдбаре на мобильных */
+@media (max-width: 900px) {
+  #sidebar .sidebar-header button {
+    font-size: 0.8rem;
+  }
+}
