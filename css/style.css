@@ -63,16 +63,18 @@ body {
     .btn-label { display: none; }
 }
 
-/* ==================== САЙДБАР ==================== */
+/* ==================== САЙДБАР (ИСПРАВЛЕННЫЙ СКРОЛЛ) ==================== */
 #sidebar {
     width:var(--sidebar-width); min-width:var(--sidebar-width);
     background:var(--surface); border-right:2px solid var(--accent-blue);
-    display:flex; flex-direction:column; height:100vh; transition:transform 0.3s; z-index:90;
+    display:flex; flex-direction:column; height:100vh; 
+    transition:transform 0.3s; z-index:90;
     box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    overflow: hidden;
 }
 #sidebar-header { 
     padding:16px; border-bottom:2px solid var(--accent-blue); 
-    background:var(--surface); position:sticky; top:0; z-index:5; 
+    background:var(--surface); flex-shrink: 0;
 }
 #sidebar-header h2 { color:var(--accent-blue); font-size:1.05rem; display:flex; align-items:center; gap:8px; }
 #sidebar-header button {
@@ -90,7 +92,13 @@ body {
     outline:none; font-size:0.88rem; 
 }
 #search-box:focus { border-color:var(--accent-blue); box-shadow:0 0 0 2px rgba(88,166,255,0.2); }
-#tree-container { flex:1; overflow-y:auto; padding:4px 0; -webkit-overflow-scrolling:touch; }
+#tree-container { 
+    flex:1; 
+    overflow-y:auto; 
+    overflow-x:hidden;
+    padding:4px 0; 
+    -webkit-overflow-scrolling:touch;
+}
 .semester-group { border-bottom:1px solid var(--border); }
 .semester-header { 
     padding:10px 16px; cursor:pointer; font-weight:600; 
@@ -121,6 +129,12 @@ body {
 .progress-mini { height:3px; background:#30363d; border-radius:2px; margin-top:6px; }
 .progress-mini-fill { height:100%; background:var(--accent-green); border-radius:2px; width:0%; transition:width 0.3s; }
 #lesson-counter { font-size:0.68rem; color:var(--text-secondary); display:block; margin-top:4px; }
+
+/* Кастомный скроллбар для сайдбара */
+#tree-container::-webkit-scrollbar { width: 6px; }
+#tree-container::-webkit-scrollbar-track { background: var(--surface); }
+#tree-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+#tree-container::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
 
 /* ==================== КОНТЕНТ ==================== */
 #content { 
@@ -252,7 +266,8 @@ td { color:var(--text); }
     #sidebar { 
         position:fixed; top:var(--header-height); left:0; bottom:0; 
         transform:translateX(-100%); width:85%; max-width:360px; 
-        height:calc(100vh - var(--header-height)); z-index:95; 
+        height:calc(100vh - var(--header-height)); z-index:95;
+        overflow: hidden;
     }
     #sidebar.open { transform:translateX(0); }
     #sidebar-overlay.active { display:block; }
@@ -323,4 +338,4 @@ td { color:var(--text); }
         background: white !important;
         border-left: 3px solid #333 !important;
     }
-}
+    }
