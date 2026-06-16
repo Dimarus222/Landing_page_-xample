@@ -17,12 +17,10 @@
     <link rel="stylesheet" href="css/style.css">
     
     <!-- Font Awesome 6.5.0 -->
-    <link rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- highlight.js 11.9.0 -->
-    <link rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     
     <!-- PWA-манифест -->
@@ -30,73 +28,79 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+
+    <!-- Стили карты обучения -->
+    <style>
+        .roadmap-container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        .roadmap-title { text-align: center; font-size: 2rem; color: var(--accent-blue); margin-bottom: 10px; font-weight: bold; }
+        .roadmap-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 40px; font-size: 0.95rem; }
+        .roadmap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .roadmap-card { background: var(--surface); border: 2px solid var(--border); border-radius: 16px; padding: 24px; position: relative; transition: all 0.3s ease; cursor: pointer; overflow: hidden; }
+        .roadmap-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.3); border-color: var(--accent-blue); }
+        .roadmap-card.completed { border-color: var(--accent-green); }
+        .roadmap-card.completed::after { content: '✓'; position: absolute; top: 16px; right: 16px; font-size: 1.5rem; color: var(--accent-green); font-weight: bold; }
+        .roadmap-card-icon { font-size: 2.5rem; margin-bottom: 16px; }
+        .roadmap-card-number { font-size: 0.8rem; color: var(--accent-blue); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .roadmap-card-title { font-size: 1.3rem; font-weight: bold; color: var(--text); margin-bottom: 8px; }
+        .roadmap-card-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
+        .roadmap-card-stats { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-secondary); }
+        .roadmap-progress-mini { height: 6px; background: var(--border); border-radius: 3px; margin-top: 12px; overflow: hidden; }
+        .roadmap-progress-fill { height: 100%; background: var(--accent-green); border-radius: 3px; transition: width 0.5s ease; }
+        .roadmap-card-link { display: inline-block; margin-top: 12px; padding: 6px 14px; background: var(--accent-blue); color: #fff; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; transition: background 0.2s; }
+        .roadmap-card-link:hover { background: #3b7fd4; }
+        @media (max-width: 768px) { .roadmap-grid { grid-template-columns: 1fr; } .roadmap-title { font-size: 1.5rem; } }
+    </style>
 </head>
 <body>
 
-<!-- ==================== МОБИЛЬНЫЙ ТОПБАР ==================== -->
 <div id="mobile-topbar">
     <span class="logo"><i class="fas fa-shield-haltered"></i> SecOpticon</span>
-    
     <span id="offline-indicator" title="Оффлайн-режим" style="display:none;">📡</span>
-    
-    <button id="theme-toggle-mobile" onclick="toggleTheme()" aria-label="Переключить тему оформления" title="Сменить тему (тёмная/светлая/сепия)">
-        <i class="fas fa-palette"></i>
-        <span class="btn-label">Тема</span>
+    <button id="theme-toggle-mobile" onclick="toggleTheme()" aria-label="Переключить тему оформления" title="Сменить тему (тёмная/сепия)">
+        <i class="fas fa-palette"></i><span class="btn-label">Тема</span>
     </button>
-    
     <button id="menu-toggle" onclick="toggleMobileSidebar()" aria-label="Открыть меню навигации" title="Меню уроков">
-        <i class="fas fa-bars"></i>
-        <span class="btn-label">Меню</span>
+        <i class="fas fa-bars"></i><span class="btn-label">Меню</span>
     </button>
 </div>
 
-<!-- ==================== ОВЕРЛЕЙ ==================== -->
 <div id="sidebar-overlay" onclick="closeMobileSidebar()" role="presentation" aria-hidden="true"></div>
 
-<!-- ==================== САЙДБАР ==================== -->
 <aside id="sidebar" role="navigation" aria-label="Оглавление курса">
     <div id="sidebar-header">
         <h2><i class="fas fa-shield-haltered"></i> SecOpticon</h2>
         
-        <!-- Случайный урок -->
-        <button onclick="openRandomLesson()" 
-                style="width:100%; padding:8px; margin:6px 0; background:var(--surface2); border:1px solid var(--border); color:var(--accent-cyan); border-radius:6px; cursor:pointer; font-size:0.85rem;"
-                aria-label="Открыть случайный урок">
+        <button onclick="openRandomLesson()" style="width:100%; padding:8px; margin:6px 0; background:var(--surface2); border:1px solid var(--border); color:var(--accent-cyan); border-radius:6px; cursor:pointer; font-size:0.85rem;" aria-label="Открыть случайный урок">
             <i class="fas fa-random"></i> Случайный урок
         </button>
         
-        <!-- Поиск -->
+        <button onclick="renderRoadmap()" style="width:100%; padding:8px; margin:4px 0 8px 0; background:var(--surface2); border:1px solid var(--accent-purple); color:var(--accent-purple); border-radius:6px; cursor:pointer; font-size:0.85rem;" aria-label="Открыть карту обучения">
+            <i class="fas fa-map"></i> Карта обучения
+        </button>
+        
         <input type="text" id="search-box" placeholder="Поиск по урокам..." oninput="filterLessons()" aria-label="Поиск по названию и содержимому уроков">
         
-        <!-- Прогресс -->
         <div class="progress-mini">
             <div class="progress-mini-fill" id="global-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Общий прогресс курса"></div>
         </div>
         <small id="lesson-counter">Загружено уроков: 0</small>
         
-        <!-- Кнопки управления -->
         <div style="display:flex; gap:4px; margin-top:8px;">
-            <button onclick="toggleTheme()" title="Сменить тему (тёмная/светлая/сепия)" aria-label="Сменить тему оформления"
-                    style="flex:1; padding:7px 4px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
+            <button onclick="toggleTheme()" title="Сменить тему (тёмная/сепия)" aria-label="Сменить тему оформления" style="flex:1; padding:7px 4px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
                 <i class="fas fa-palette"></i> Тема
             </button>
-            <button onclick="exportProgress()" title="Скачать прогресс, заметки и избранное" aria-label="Скачать резервную копию"
-                    style="flex:1; padding:7px 4px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
+            <button onclick="exportProgress()" title="Скачать прогресс" aria-label="Скачать резервную копию" style="flex:1; padding:7px 4px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
                 <i class="fas fa-download"></i> Резерв
             </button>
-            <button onclick="document.getElementById('import-progress-input').click()" title="Загрузить прогресс из файла" aria-label="Загрузить резервную копию"
-                    style="flex:1; padding:7px 4px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
+            <button onclick="document.getElementById('import-progress-input').click()" title="Загрузить прогресс" aria-label="Загрузить резервную копию" style="flex:1; padding:7px 4px; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; cursor:pointer; font-size:0.75rem;">
                 <i class="fas fa-upload"></i> Загрузить
             </button>
             <input type="file" id="import-progress-input" accept=".json" onchange="importProgress(this)" style="display:none;" aria-label="Выберите файл резервной копии">
         </div>
     </div>
-    
-    <!-- Дерево уроков -->
     <div id="tree-container"></div>
 </aside>
 
-<!-- ==================== КОНТЕНТ ==================== -->
 <main id="content" role="main" aria-label="Содержание урока">
     <div id="lesson-render">
         <div id="welcome-screen">
@@ -105,26 +109,26 @@
             <p style="color:var(--text-secondary);">Специалитет 10.05.01 «Компьютерная безопасность»</p>
             <p>27+ уроков, курс пополняется. Выберите урок в боковом меню или используйте поиск.</p>
             <p style="color:var(--accent-law);"><i class="fas fa-gavel"></i> Все материалы — для локального изучения.</p>
+            <button onclick="renderRoadmap()" style="margin-top:20px; padding:10px 24px; background:var(--accent-blue); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1rem; font-weight:bold;">
+                <i class="fas fa-map"></i> Открыть карту обучения
+            </button>
         </div>
     </div>
 </main>
 
-<!-- ==================== ДАННЫЕ СЕМЕСТРОВ ==================== -->
 <script src="js/data/s1-math.js"></script>
 <script src="js/data/s2-cs.js"></script>
 <script src="js/data/s3-os-net.js"></script>
 <script src="js/data/s4-crypto.js"></script>
 <script src="js/data/s5-websec.js"></script>
 
-<!-- ==================== ЯДРО ПРИЛОЖЕНИЯ ==================== -->
 <script src="js/app.js"></script>
 
-<!-- ==================== SERVICE WORKER ==================== -->
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
-      .then(function(reg) { console.log('✅ SW зарегистрирован'); })
-      .catch(function(err) { console.log('❌ SW ошибка:', err); });
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW failed', err));
   }
 </script>
 
