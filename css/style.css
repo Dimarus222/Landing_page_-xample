@@ -114,3 +114,61 @@ th { background:#1c2333; font-weight:600; }
     #content { padding:40px 70px; }
     #lesson-render { max-width:1100px; }
 }
+
+
+/* ==================== ТЕМЫ ==================== */
+[data-theme="light"] {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface2: #e8e8e8;
+    --text: #1a1a1a;
+    --text-secondary: #555;
+    --border: #ddd;
+    --accent-blue: #2563eb;
+    --accent-green: #16a34a;
+    --accent-red: #dc2626;
+    --accent-yellow: #b45309;
+    --accent-cyan: #0d9488;
+    --accent-purple: #7c3aed;
+    --accent-pink: #db2777;
+    --accent-law: #ea580c;
+}
+
+[data-theme="sepia"] {
+    --bg: #f4ecd8;
+    --surface: #faf3e6;
+    --surface2: #e8dcc8;
+    --text: #433422;
+    --text-secondary: #6b5b44;
+    --border: #c4b896;
+    --accent-blue: #1e40af;
+    --accent-green: #166534;
+    --accent-red: #991b1b;
+    --accent-yellow: #92400e;
+    --accent-cyan: #115e59;
+    --accent-purple: #5b21b6;
+    --accent-pink: #9d174d;
+    --accent-law: #9a3412;
+}
+
+/* Активный фильтр */
+.semester-header.active-filter {
+    background: #1a2332;
+    border-left: 3px solid var(--accent-yellow);
+}
+
+/* Стили для печати */
+@media print {
+    #sidebar, #mobile-topbar, #sidebar-overlay, .nav-buttons, #notes-panel {
+        display: none !important;
+    }
+    #content {
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+    body {
+        display: block !important;
+        background: white !important;
+        color: black !important;
+    }
+}
