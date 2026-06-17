@@ -338,4 +338,20 @@ td { color:var(--text); }
         background: white !important;
         border-left: 3px solid #333 !important;
     }
+    
+    /* === ВАЖНО: Показывать скрытые ответы при печати === */
+    #lesson-render div[style*="display:none"] {
+        display: block !important;
+        background: #f5f5f5 !important;
+        border: 1px solid #ccc !important;
+        border-left: 3px solid #333 !important;
+        padding: 10px !important;
+        margin-top: 6px !important;
+        border-radius: 4px !important;
     }
+    
+    /* Скрыть кнопки "Показать ответ" при печати */
+    #lesson-render button[onclick*="this.nextElementSibling"] {
+        display: none !important;
+    }
+}
