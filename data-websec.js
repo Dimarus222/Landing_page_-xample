@@ -62,6 +62,18 @@ $stmt->execute([$login, hash('sha256', $password)]);</code></pre>
 <p><span class="definition">CSRF</span> заставляет браузер жертвы, уже авторизованной на сайте, незаметно отправить запрос от её имени (например, открыв вредоносную страницу с автоотправляющейся формой). Работает потому, что браузер автоматически прикладывает cookie сессии к любому запросу на домен, независимо от того, с какой страницы он инициирован.</p>
 <p><b>Защита:</b> CSRF-токен, уникальный для сессии/формы и не предсказуемый извне; атрибут cookie <code>SameSite=Lax/Strict</code>, ограничивающий отправку cookie в кросс-доменных запросах; проверка заголовка <code>Origin</code>/<code>Referer</code> для чувствительных действий.</p>
 </div>
+
+<div class="example-block"><h4>🧪 Практика: попробуй сам</h4>
+<p>Ниже — живая песочница. В HTML-вкладке уже есть поле поиска, которое небезопасно вставляет ввод пользователя в DOM через <code>innerHTML</code> (JS-вкладка). Введи в поле <code>&lt;img src=x onerror=alert(1)&gt;</code> и нажми «Искать» в превью — увидишь, как выполняется чужой JS. Затем попробуй исправить JS-код так, чтобы использовать <code>textContent</code> вместо <code>innerHTML</code>, и убедись, что атака перестала срабатывать.</p>
+${ideBlock({
+  id: 'ide-xss-demo',
+  mode: 'web',
+  label: 'Песочница: уязвимый поиск (XSS) — попробуй атаковать и починить',
+  html: '<input id="q" placeholder="Введи поисковый запрос..." style="padding:8px;width:70%;">\\n<button onclick="search()">Искать</button>\\n<div id="result" style="margin-top:12px;padding:10px;background:#eee;"></div>',
+  css: 'body{font-family:sans-serif;padding:10px;}',
+  js: '// Уязвимо: innerHTML вставляет ввод пользователя как разметку\\nfunction search() {\\n  var q = document.getElementById("q").value;\\n  document.getElementById("result").innerHTML = "Результаты по запросу: " + q;\\n}\\n\\n// Попробуй заменить строку выше на:\\n// document.getElementById("result").textContent = "Результаты по запросу: " + q;'
+})}
+</div>
 `, ["OWASP Cross Site Scripting Prevention Cheat Sheet", "OWASP CSRF Prevention Cheat Sheet", "MDN — Content-Security-Policy"])));
 
     // 5.3

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kernel-v6';
+const CACHE_NAME = 'kernel-v7';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',

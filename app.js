@@ -3,6 +3,142 @@
 // См. CLAUDE.md для карты архитектуры и инструкций по дальнейшей доработке.
 
 let DB = { semesters: [] };
+
+// ==================== ВСТРОЕННАЯ IDE ДЛЯ ПРАКТИКИ ====================
+// Два режима:
+//  - mode: 'web'  -> живой HTML/CSS/JS-редактор с превью в sandboxed iframe (работает офлайн)
+//  - mode: 'exec' -> выполнение кода (Python и др.) через бесплатный публичный API Piston
+//                     (github.com/engineer-man/piston, emkc.org) — требует интернет
+window.__IDE_STARTERS = window.__IDE_STARTERS || {};
+
+function escHtmlIDE(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function ideBlock(cfg) {
+  if (!cfg || !cfg.id) { console.error('ideBlock: нужен уникальный id'); return ''; }
+  var id = cfg.id;
+  window.__IDE_STARTERS[id] = cfg;
+  if (cfg.mode === 'web') {
+    return '<div class="ide-block" data-mode="web" data-ide-id="' + id + '">' +
+      (cfg.label ? '<div class="ide-label"><i class="fas fa-flask"></i> ' + escHtmlIDE(cfg.label) + '</div>' : '') +
+      '<div class="ide-tabs">' +
+      '<button type="button" class="ide-tab active" onclick="switchIDETab(\'' + id + '\',\'html\',this)">HTML</button>' +
+      '<button type="button" class="ide-tab" onclick="switchIDETab(\'' + id + '\',\'css\',this)">CSS</button>' +
+      '<button type="button" class="ide-tab" onclick="switchIDETab(\'' + id + '\',\'js\',this)">JS</button>' +
+      '</div>' +
+      '<textarea class="ide-editor" id="' + id + '-html" spellcheck="false">' + escHtmlIDE(cfg.html || '') + '</textarea>' +
+      '<textarea class="ide-editor" id="' + id + '-css" style="display:none" spellcheck="false">' + escHtmlIDE(cfg.css || '') + '</textarea>' +
+      '<textarea class="ide-editor" id="' + id + '-js" style="display:none" spellcheck="false">' + escHtmlIDE(cfg.js || '') + '</textarea>' +
+      '<div class="ide-toolbar">' +
+      '<button type="button" class="ide-run-btn" onclick="runIDE(\'' + id + '\')"><i class="fas fa-play"></i> Запустить</button>' +
+      '<button type="button" class="ide-reset-btn" onclick="resetIDE(\'' + id + '\')"><i class="fas fa-undo"></i> Сбросить</button>' +
+      '</div>' +
+      '<iframe class="ide-output-frame" id="' + id + '-frame" sandbox="allow-scripts" title="Результат выполнения"></iframe>' +
+      '</div>';
+  }
+  return '<div class="ide-block" data-mode="exec" data-ide-id="' + id + '">' +
+    (cfg.label ? '<div class="ide-label"><i class="fas fa-flask"></i> ' + escHtmlIDE(cfg.label) + '</div>' : '') +
+    '<div class="ide-tabs"><span class="ide-lang-badge">' + escHtmlIDE(cfg.lang || 'python') + '</span>' +
+    '<span class="ide-lang-note">выполняется удалённо, нужен интернет</span></div>' +
+    '<textarea class="ide-editor" id="' + id + '-code" spellcheck="false">' + escHtmlIDE(cfg.starter || '') + '</textarea>' +
+    '<div class="ide-toolbar">' +
+    '<button type="button" class="ide-run-btn" onclick="runIDE(\'' + id + '\')"><i class="fas fa-play"></i> Запустить</button>' +
+    '<button type="button" class="ide-reset-btn" onclick="resetIDE(\'' + id + '\')"><i class="fas fa-undo"></i> Сбросить</button>' +
+    '</div>' +
+    '<pre class="ide-console" id="' + id + '-console">Нажми «Запустить», чтобы выполнить код.</pre>' +
+    '</div>';
+}
+
+function switchIDETab(id, target, btn) {
+  var block = btn.closest('.ide-block');
+  if (!block) return;
+  block.querySelectorAll('.ide-tab').forEach(function(t) { t.classList.remove('active'); });
+  btn.classList.add('active');
+  ['html', 'css', 'js'].forEach(function(k) {
+    var el = document.getElementById(id + '-' + k);
+    if (el) el.style.display = (k === target) ? 'block' : 'none';
+  });
+}
+
+function runIDE(id) {
+  var block = document.querySelector('.ide-block[data-ide-id="' + id + '"]');
+  if (!block) return;
+  var mode = block.getAttribute('data-mode');
+  if (mode === 'web') {
+    var htmlEl = document.getElementById(id + '-html');
+    var cssEl = document.getElementById(id + '-css');
+    var jsEl = document.getElementById(id + '-js');
+    var frame = document.getElementById(id + '-frame');
+    if (!htmlEl || !frame) return;
+    var jsSafe = (jsEl.value || '').replace(/<\/script>/g, '<\\/script>');
+    var srcdoc = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>' + (cssEl.value || '') +
+      '</style></head><body>' + htmlEl.value + '<script>' + jsSafe + '<' + '/script></body></html>';
+    frame.srcdoc = srcdoc;
+    return;
+  }
+  var codeEl = document.getElementById(id + '-code');
+  var consoleEl = document.getElementById(id + '-console');
+  if (!codeEl || !consoleEl) return;
+  var cfg = window.__IDE_STARTERS[id] || {};
+  var lang = cfg.lang || 'python';
+  var versions = { python: '3.10.0', javascript: '18.15.0', 'c++': '10.2.0', c: '10.2.0', java: '15.0.2', go: '1.16.2', php: '8.2.3', bash: '5.2.0' };
+  consoleEl.textContent = 'Выполняется…';
+  consoleEl.classList.remove('ide-console-error');
+  fetch('https://emkc.org/api/v2/piston/execute', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      language: lang,
+      version: versions[lang] || '*',
+      files: [{ content: codeEl.value }]
+    })
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    var out = '';
+    if (data.compile && data.compile.stderr) out += data.compile.stderr + '\n';
+    if (data.run) out += (data.run.stdout || '') + (data.run.stderr || '');
+    consoleEl.textContent = out.trim() || '(программа не вывела ничего в stdout)';
+    if (data.run && data.run.code !== 0) consoleEl.classList.add('ide-console-error');
+  }).catch(function(err) {
+    consoleEl.textContent = '❌ Не удалось выполнить код: сервис выполнения недоступен или нет соединения с интернетом.';
+    consoleEl.classList.add('ide-console-error');
+  });
+}
+
+function resetIDE(id) {
+  var cfg = window.__IDE_STARTERS[id];
+  if (!cfg) return;
+  if (cfg.mode === 'web') {
+    var h = document.getElementById(id + '-html'), c = document.getElementById(id + '-css'), j = document.getElementById(id + '-js');
+    if (h) h.value = cfg.html || '';
+    if (c) c.value = cfg.css || '';
+    if (j) j.value = cfg.js || '';
+    runIDE(id);
+  } else {
+    var codeEl = document.getElementById(id + '-code');
+    if (codeEl) codeEl.value = cfg.starter || '';
+    var consoleEl = document.getElementById(id + '-console');
+    if (consoleEl) { consoleEl.textContent = 'Нажми «Запустить», чтобы выполнить код.'; consoleEl.classList.remove('ide-console-error'); }
+  }
+}
+
+function initAllIDEBlocks() {
+  document.querySelectorAll('.ide-block[data-mode="web"]').forEach(function(block) {
+    runIDE(block.getAttribute('data-ide-id'));
+  });
+  document.querySelectorAll('.ide-editor').forEach(function(ta) {
+    if (ta.__tabBound) return;
+    ta.__tabBound = true;
+    ta.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var start = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.slice(0, start) + '  ' + ta.value.slice(end);
+        ta.selectionStart = ta.selectionEnd = start + 2;
+      }
+    });
+  });
+}
 let currentSemesterId = null;
 let currentLessonId = null;
 let totalLessons = 0;
@@ -543,7 +679,7 @@ function renderResourceBanks(semester) {
 function renderBreadcrumbs(semester, lesson) {
   return '<div class="breadcrumbs" style="display:flex;gap:8px;align-items:center;margin-bottom:16px;' +
     'font-size:0.8rem;color:var(--text-secondary);flex-wrap:wrap;" aria-label="Навигационная цепочка">' +
-    '<a href="#s1/1.1" style="color:var(--accent-blue);text-decoration:none;" aria-label="На главную">' +
+    '<a href="#" onclick="event.preventDefault();renderRoadmap();" style="color:var(--accent-blue);text-decoration:none;" aria-label="На главную">' +
     '<i class="fas fa-home"></i> Главная</a><span>/</span>' +
     '<a href="#" onclick="event.preventDefault();toggleSemester(' + semester.id +
     ');document.getElementById(\'content\').scrollTop=0;" style="color:var(--accent-blue);text-decoration:none;">' +
@@ -967,6 +1103,8 @@ function loadLesson(semesterId, lessonId, skipPushState) {
     });
   }
 
+  initAllIDEBlocks();
+
   setTimeout(function() {
     var al = document.querySelector('.lesson-link.active');
     if (al) al.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1074,7 +1212,7 @@ function renderRoadmap() {
     html += '<div class="roadmap-card-stats"><span>' + completed + ' из ' + total +
       ' пройдено</span><span>' + pct + '%</span></div>';
     html += '<a href="#s' + sem.id + '/' + firstLessonId +
-      '" class="roadmap-card-link" onclick="event.stopPropagation();">Начать →</a>';
+      '" class="roadmap-card-link" onclick="event.preventDefault();event.stopPropagation();loadLesson(' + sem.id + ', \'' + firstLessonId + '\');">Начать →</a>';
     html += '</div>';
   });
 

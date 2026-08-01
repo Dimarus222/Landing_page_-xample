@@ -84,6 +84,17 @@ signature = hmac.new(secret, message, hashlib.sha256).hexdigest()
 <div class="lesson-card"><h3>Цифровая подпись</h3>
 <p>В отличие от HMAC (симметричный секрет), цифровая подпись строится на асимметричной паре ключей: подписывающий использует приватный ключ, а проверить подпись может кто угодно публичным ключом. Это даёт свойство <b>неотказуемости</b> (non-repudiation) — подписавший не может правдоподобно отрицать авторство. Схемы: RSA-PSS, ECDSA, EdDSA (Ed25519 — быстрая и устойчивая к ряду практических ошибок реализации схема).</p>
 </div>
+
+<div class="example-block"><h4>🧪 Практика: попробуй сам</h4>
+<p>Ниже — рабочая Python-песочница (код выполняется на удалённом sandboxed-сервисе, нужен интернет). Измени <code>message</code> и убедись, что даже одна изменённая буква полностью меняет хеш (лавинный эффект). Затем попробуй вычислить HMAC с другим секретом и посмотри, как меняется подпись.</p>
+${ideBlock({
+  id: 'ide-hash-demo',
+  mode: 'exec',
+  lang: 'python',
+  label: 'Песочница: SHA-256 и HMAC на Python',
+  starter: 'import hashlib, hmac\\n\\nmessage = "Привет, KERNEL!".encode()\\n\\n# Обычный хеш\\ndigest = hashlib.sha256(message).hexdigest()\\nprint("SHA-256:", digest)\\n\\n# HMAC с секретным ключом\\nsecret = b"my-secret-key"\\nmac = hmac.new(secret, message, hashlib.sha256).hexdigest()\\nprint("HMAC-SHA256:", mac)\\n\\n# Попробуй изменить одну букву в message выше и запусти снова —\\n# посмотри, насколько сильно меняется весь хеш (лавинный эффект)'
+})}
+</div>
 `, ["NIST FIPS 180-4 (SHA-2), FIPS 202 (SHA-3)", "RFC 2104 (HMAC)", "OWASP Password Storage Cheat Sheet"])));
 
     // 4.4
