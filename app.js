@@ -167,7 +167,20 @@ function toggleComplete(id) {
   updateStatsPanel();
   buildTree();
   checkAchievements();
-  if (currentLessonId === id) renderStarButton();
+  if (currentLessonId === id) {
+    renderStarButton();
+    updateCompleteButton(id);
+  }
+}
+
+function updateCompleteButton(id) {
+  var btn = document.getElementById('complete-toggle-btn');
+  if (!btn) return;
+  var done = isCompleted(id);
+  btn.style.color = done ? 'var(--accent-green)' : 'var(--text-secondary)';
+  btn.setAttribute('aria-label', done ? 'Отметить как непройденное' : 'Отметить как пройденное');
+  btn.innerHTML = '<i class="fas ' + (done ? 'fa-check-circle' : 'fa-circle') + '"></i> ' +
+    (done ? 'Пройдено' : 'Отметить пройденным');
 }
 
 // ==================== ИЗБРАННОЕ ====================
@@ -926,9 +939,9 @@ function loadLesson(semesterId, lessonId, skipPushState) {
     '<div id="star-container"></div>' +
     '<div style="display:flex;align-items:center;gap:14px;">' +
     '<span class="reading-time"><i class="fas fa-clock"></i> ~' + minutes + ' мин чтения</span>' +
-    '<button onclick="toggleComplete(\'' + lessonId + '\')" ' +
+    '<button id="complete-toggle-btn" onclick="toggleComplete(\'' + lessonId + '\')" ' +
     'style="background:none;border:none;cursor:pointer;font-size:0.85rem;padding:4px 8px;' +
-    'border-radius:6px;color:' + (done ? 'var(--accent-green)' : 'var(--text-secondary)') + ';" ' +
+    'border-radius:6px;transition:color 0.15s ease;color:' + (done ? 'var(--accent-green)' : 'var(--text-secondary)') + ';" ' +
     'aria-label="' + (done ? 'Отметить как непройденное' : 'Отметить как пройденное') + '">' +
     '<i class="fas ' + (done ? 'fa-check-circle' : 'fa-circle') + '"></i> ' +
     (done ? 'Пройдено' : 'Отметить пройденным') + '</button></div></div>' +

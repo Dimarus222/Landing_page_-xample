@@ -202,6 +202,7 @@ body::after {
     position: relative; z-index: 2;
 }
 #lesson-render { max-width:960px; margin:0 auto; }
+#lesson-render p, .lesson-card p, .theory-block p, .warning-block p, .law-block p, .example-block p, .source-block p { text-align:justify; text-justify:inter-word; hyphens:auto; }
 #welcome-screen { text-align:center; margin-top:48px; }
 #welcome-screen i.fa-microchip, #welcome-screen i.fa-shield-halved, #welcome-screen i.fa-shield-haltered { font-size:4rem; color:var(--accent-blue); filter:drop-shadow(var(--glow-blue)); }
 #welcome-screen p { color:var(--text); }
